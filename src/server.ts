@@ -16,4 +16,35 @@
 import config from './config';
 import { initServer } from './index';
 
+const axios = require('axios'); // Instale com: npm install axios
+
+// Função para enviar dados para sua API
+async function sendToAPI(endpoint, data) {
+  try {
+    const response = await axios.post(endpoint, data);
+    console.log('Dados enviados com sucesso:', response.data);
+  } catch (error) {
+    console.error('Erro ao enviar para a API:', error.message);
+  }
+}
+
+// Ouvir mensagens recebidas
+client.onMessage(async (message) => {
+  // Extrair informações da mensagem
+  const { body, from, timestamp } = message;
+
+  // Exemplo de lógica para processar a mensagem:
+  // Suponha que a mensagem seja um pedido no formato "/novopedido {dados}"
+  if (body.startsWith('/novopedido')) {
+    const pedidoData = parsePedido(body); // Crie uma função para extrair os dados
+    await sendToAPI('https://apipizzaria-ea2f.onrender.com/pedidos/', pedidoData);
+  }
+
+  // Repita para clientes e produtos conforme necessário
+  if (body.startsWith('/novocliente')) {
+    const clienteData = parseCliente(body);
+    await sendToAPI('https://apipizzaria-ea2f.onrender.com/clientes/', clienteData);
+  }
+});
+
 initServer(config);
